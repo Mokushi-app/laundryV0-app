@@ -24,10 +24,20 @@ export default function WindowSwipe({ disabled, onOpen }: WindowSwipeProps) {
   const [opened, setOpened] = useState(false)
   const progress = useRef(new Animated.Value(0)).current
 
+  // Use a ref to store latest state to avoid stale closures in PanResponder
+  const stateRef = useRef({ disabled, opened, onOpen })
+  stateRef.current = { disabled, opened, onOpen }
+
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !disabled && !opened,
-      onMoveShouldSetPanResponder: () => !disabled && !opened,
+      // キャプチャフェーズで先取りすることで ScrollView より先にジェスチャーを確保する
+      onStartShouldSetPanResponder: () => !stateRef.current.disabled && !stateRef.current.opened,
+      onStartShouldSetPanResponderCapture: () => !stateRef.current.disabled && !stateRef.current.opened,
+      onMoveShouldSetPanResponder: (_, gs) => !stateRef.current.disabled && !stateRef.current.opened && gs.dy < -5,
+      onMoveShouldSetPanResponderCapture: (_, gs) => !stateRef.current.disabled && !stateRef.current.opened && gs.dy < -5,
+      onPanResponderGrant: () => {
+        // Scroll lock no longer needed as ScrollView is removed
+      },
       onPanResponderMove: (_, gestureState) => {
         const delta = -gestureState.dy // upward = positive
         const p = Math.min(1, Math.max(0, delta / MAX_DRAG))
@@ -38,11 +48,19 @@ export default function WindowSwipe({ disabled, onOpen }: WindowSwipeProps) {
             toValue: 1,
             useNativeDriver: false,
           }).start()
-          onOpen()
+          stateRef.current.onOpen()
         }
       },
       onPanResponderRelease: () => {
-        if (!opened) {
+        if (!stateRef.current.opened) {
+          Animated.spring(progress, {
+            toValue: 0,
+            useNativeDriver: false,
+          }).start()
+        }
+      },
+      onPanResponderTerminate: () => {
+        if (!stateRef.current.opened) {
           Animated.spring(progress, {
             toValue: 0,
             useNativeDriver: false,

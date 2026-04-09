@@ -22,10 +22,19 @@ export default function TShirtSwipe({ onCollect, collected }: TShirtSwipeProps) 
   const [done, setDone] = useState(false)
   const progress = useRef(new Animated.Value(0)).current
 
+  // Use a ref to store latest state to avoid stale closures in PanResponder
+  const stateRef = useRef({ collected, done, onCollect })
+  stateRef.current = { collected, done, onCollect }
+
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !collected && !done,
-      onMoveShouldSetPanResponder: () => !collected && !done,
+      onStartShouldSetPanResponder: () => !stateRef.current.collected && !stateRef.current.done,
+      onStartShouldSetPanResponderCapture: () => !stateRef.current.collected && !stateRef.current.done,
+      onMoveShouldSetPanResponder: (_, gs) => !stateRef.current.collected && !stateRef.current.done && gs.dx < -5,
+      onMoveShouldSetPanResponderCapture: (_, gs) => !stateRef.current.collected && !stateRef.current.done && gs.dx < -5,
+      onPanResponderGrant: () => {
+        // Scroll lock no longer needed as ScrollView is removed
+      },
       onPanResponderMove: (_, gestureState) => {
         const delta = -gestureState.dx // left = positive
         const p = Math.min(1, Math.max(0, delta / MAX_DRAG))
@@ -36,11 +45,19 @@ export default function TShirtSwipe({ onCollect, collected }: TShirtSwipeProps) 
             toValue: 1,
             useNativeDriver: false,
           }).start()
-          onCollect()
+          stateRef.current.onCollect()
         }
       },
       onPanResponderRelease: () => {
-        if (!done) {
+        if (!stateRef.current.done) {
+          Animated.spring(progress, {
+            toValue: 0,
+            useNativeDriver: false,
+          }).start()
+        }
+      },
+      onPanResponderTerminate: () => {
+        if (!stateRef.current.done) {
           Animated.spring(progress, {
             toValue: 0,
             useNativeDriver: false,

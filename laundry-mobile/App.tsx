@@ -5,9 +5,9 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
 } from 'react-native'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Ionicons } from '@expo/vector-icons'
 import Svg, { Path } from 'react-native-svg'
@@ -120,6 +120,7 @@ export default function SentakuApp() {
   const streak = 5
 
   return (
+    <SafeAreaProvider>
     <LinearGradient colors={BG_GRADIENT[state.phase]} style={styles.root}>
       <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
@@ -148,12 +149,8 @@ export default function SentakuApp() {
           phase={state.phase}
         />
 
-        {/* ── Scrollable body ── */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
+        {/* ── Main content body (Non-scrollable) ── */}
+        <View style={styles.contentContainer}>
           {state.showHistory ? (
             <ScoreHistory entries={HISTORY} totalScore={totalScore} streak={streak} />
           ) : (
@@ -189,7 +186,10 @@ export default function SentakuApp() {
                       ? '窓を開けてください'
                       : `あと${state.remainingMinutes - WINDOW_MINUTES}分で窓が解放されます`}
                   </Text>
-                  <WindowSwipe disabled={!windowUnlocked} onOpen={handleWindowOpen} />
+                  <WindowSwipe 
+                    disabled={!windowUnlocked} 
+                    onOpen={handleWindowOpen} 
+                  />
                 </View>
               )}
 
@@ -197,7 +197,10 @@ export default function SentakuApp() {
               {state.windowOpen && !state.collected && (
                 <View style={styles.centered}>
                   <Text style={styles.hintText}>洗濯物を取り込んでください</Text>
-                  <TShirtSwipe onCollect={handleCollect} collected={false} />
+                  <TShirtSwipe 
+                    onCollect={handleCollect} 
+                    collected={false} 
+                  />
                 </View>
               )}
 
@@ -231,7 +234,7 @@ export default function SentakuApp() {
               )}
             </>
           )}
-        </ScrollView>
+        </View>
 
         {/* ── Bottom Nav ── */}
         <View style={styles.bottomNav}>
@@ -276,6 +279,7 @@ export default function SentakuApp() {
         </View>
       </SafeAreaView>
     </LinearGradient>
+    </SafeAreaProvider>
   )
 }
 
@@ -311,13 +315,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scrollView: {
+  contentContainer: {
     flex: 1,
-  },
-  scrollContent: {
     paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    gap: SPACING.lg,
+    paddingVertical: SPACING.md,
+    gap: SPACING.md,
+    justifyContent: 'center',
   },
   centered: {
     alignItems: 'center',

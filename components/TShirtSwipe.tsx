@@ -57,7 +57,7 @@ export default function TShirtSwipe({ onCollect, collected }: TShirtSwipeProps) 
 
   return (
     <div
-      className="flex flex-col items-center gap-6"
+      className="flex flex-col items-center gap-6 select-none touch-none"
       aria-label="Tシャツを左にスワイプして取り込む"
     >
       {/* Clothesline */}
@@ -83,6 +83,7 @@ export default function TShirtSwipe({ onCollect, collected }: TShirtSwipeProps) 
               left: "calc(50% - 40px)",
               transform: `translateX(${shirtX}px) rotate(${progress * -15}deg)`,
               transition: dragging.current ? "none" : "transform 0.3s",
+              touchAction: "none",
             }}
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}

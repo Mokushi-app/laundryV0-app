@@ -79,8 +79,8 @@ export default function WeatherHeader({
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.lg,
+    paddingTop: SPACING.md,
+    paddingBottom: SPACING.md,
     paddingHorizontal: SPACING.lg,
     borderBottomLeftRadius: BORDER_RADIUS.xl,
     borderBottomRightRadius: BORDER_RADIUS.xl,

@@ -72,7 +72,7 @@ export default function WindowSwipe({ disabled, onOpen }: WindowSwipeProps) {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3 select-none" aria-label="窓を上にスワイプして開ける">
+    <div className="flex flex-col items-center gap-3 select-none touch-none" aria-label="窓を上にスワイプして開ける">
       {/* Window frame */}
       <div
         className="relative w-48 h-36 rounded-2xl border-4 overflow-hidden cursor-pointer"
@@ -116,7 +116,7 @@ export default function WindowSwipe({ disabled, onOpen }: WindowSwipeProps) {
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={end}
-          style={{ transform: `translateY(-${handleY}px)`, transition: dragging.current ? "none" : "transform 0.3s" }}
+          style={{ transform: `translateY(-${handleY}px)`, transition: dragging.current ? "none" : "transform 0.3s", touchAction: "none" }}
         >
           <div className="swipe-glow w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg cursor-grab active:cursor-grabbing">
             <ChevronsUp size={28} className="text-primary-foreground" />

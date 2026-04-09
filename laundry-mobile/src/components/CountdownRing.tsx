@@ -11,8 +11,8 @@ interface CountdownRingProps {
   phase: Phase
 }
 
-const SIZE = 180
-const STROKE = 12
+const SIZE = 120
+const STROKE = 8
 const R = (SIZE - STROKE) / 2
 const CIRC = 2 * Math.PI * R
 
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   timeText: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: '900',
     color: COLORS.white,
     fontVariant: ['tabular-nums'],
